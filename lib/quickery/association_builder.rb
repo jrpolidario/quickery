@@ -15,53 +15,50 @@ module Quickery
       @column_names = model.column_names
     end
 
-    def get_child_builders(include_self: false, builders: [])
+    # we need to prepend _quickery to all methods, to make sure no conflicts with association names that are dynamically invoked through `method_missing` below
+
+    def _quickery_get_child_builders(include_self: false, builders: [])
       builders << self if include_self
 
       if @child_builder.nil?
         builders
       else
         builders << @child_builder
-        return @child_builder.get_child_builders(builders: builders)
+        return @child_builder._quickery_get_child_builders(builders: builders)
       end
     end
 
-    def get_parent_builders(include_self: false, builders: [])
+    def _quickery_get_parent_builders(include_self: false, builders: [])
       builders << self if include_self
 
       if @parent_builder.nil?
         builders
       else
         builders << @parent_builder
-        @parent_builder.get_parent_builders(builders: builders)
+        @parent_builder._quickery_get_parent_builders(builders: builders)
       end
     end
 
-    def get_joins_arg(current_joins_arg = nil)
+    def _quickery_get_joins_arg(current_joins_arg = nil)
       if @parent_builder.nil?
-        if current_joins_arg.nil?
-          return nil
-        else
-          return current_joins_arg
-        end
+        current_joins_arg
       else
-
         if current_joins_arg.nil?
-          return @parent_builder.get_joins_arg(@inverse_association_name.to_sym)
+          @parent_builder._quickery_get_joins_arg(@inverse_association_name.to_sym)
         else
-          return @parent_builder.get_joins_arg({ @inverse_association_name.to_sym => current_joins_arg })
+          @parent_builder._quickery_get_joins_arg({ @inverse_association_name.to_sym => current_joins_arg })
         end
       end
     end
 
-    def dependent_records(record_to_be_saved)
+    def _quickery_dependent_records(record_to_be_saved)
       primary_key_value = record_to_be_saved.send(record_to_be_saved.class.primary_key)
-      most_parent_model = get_parent_builders.last.model
+      most_parent_model = _quickery_get_parent_builders.last.model
 
       records = most_parent_model.all
 
-      unless get_joins_arg.empty?
-        records = records.joins(get_joins_arg)
+      unless (joins_arg = _quickery_get_joins_arg).nil?
+        records = records.joins(joins_arg)
       end
 
       records = records.where(
@@ -71,22 +68,13 @@ module Quickery
       )
     end
 
-    def dependee_record(record_to_be_saved)
-      get_child_builders(include_self: true).inject(record_to_be_saved) do |record, association_builder|
+    def _quickery_dependee_record(record_to_be_saved)
+      _quickery_get_child_builders(include_self: true).inject(record_to_be_saved) do |record, association_builder|
         if association_builder.belongs_to
           record.send(association_builder.belongs_to.name)
         else
           record
         end
-      end
-    end
-
-    def all_association_builders(current_association_builders = [])
-      current_association_builders << self
-      if @parent_builder.nil?
-        current_association_builders
-      else
-        @parent_builder.all_association_builders(current_association_builders)
       end
     end
 
