@@ -69,6 +69,8 @@ module Quickery
     end
 
     def _quickery_dependee_record(record_to_be_saved)
+      raise ArgumentError, 'argument should be an instance of @model' unless record_to_be_saved.is_a? model
+
       _quickery_get_child_builders(include_self: true).inject(record_to_be_saved) do |record, association_builder|
         if association_builder.belongs_to
           record.send(association_builder.belongs_to.name)
@@ -86,7 +88,7 @@ module Quickery
         @belongs_to = @reflections[method_name_str]
         @child_builder = AssociationBuilder.new(model: belongs_to.class_name.constantize, parent_builder: self, inverse_association_name: method_name_str)
       elsif @column_names.include? method_name_str
-        CallbacksBuilder.new(dependee_column_name: method_name_str, last_association_builder: self)
+        QuickeryBuilder.new(dependee_column_name: method_name_str, last_association_builder: self)
       else
         super
       end
