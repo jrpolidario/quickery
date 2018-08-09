@@ -31,9 +31,9 @@ module Quickery
             else
               dependee_record = first_association_builder._quickery_dependee_record(self)
               new_value = dependee_record.send(dependee_column_name)
-
-              assign_attributes(depender_column_name => new_value)
             end
+
+            assign_attributes(depender_column_name => new_value)
           end
         end
       end
@@ -41,13 +41,14 @@ module Quickery
 
     # add callback to sync changes when dependee_column has been updated
     def add_callback_to_dependee_model
-      last_association_builder = @quickery_builder.first_association_builder
+      last_association_builder = @quickery_builder.last_association_builder
       depender_column_name = @quickery_builder.depender_column_name
       dependee_column_name = @quickery_builder.dependee_column_name
 
       last_association_builder.model.class_exec do
 
         before_update do
+          byebug
           if changes.keys.include? dependee_column_name
             new_value = send(dependee_column_name)
 
@@ -76,10 +77,10 @@ module Quickery
               else
                 dependee_record = association_builder._quickery_dependee_record(self)
                 new_value = dependee_record.send(dependee_column_name)
-
-                dependent_records = association_builder._quickery_dependent_records(self)
-                dependent_records.update_all(depender_column_name => new_value)
               end
+
+              dependent_records = association_builder._quickery_dependent_records(self)
+              dependent_records.update_all(depender_column_name => new_value)
             end
           end
         end

@@ -7,7 +7,16 @@
 /spec/reports/
 /tmp/
 
+/spec/internal/log/*
+/spec/internal/tmp/*
+*.sqlite
+*.sqlite-journal
+
 # rspec failure tracking
 .rspec_status
 
 *.gem
+.byebug_history
+
+Gemfile.lock
+gemfiles/*.lock
