@@ -38,7 +38,7 @@ class Employee < ApplicationRecord
   belongs_to :branch
 
   quickery do
-    # TL;RD: the following line means:
+    # TL;DR: the following line means:
     #   make sure that this record's `branch_company_name` attribute will always have
     #   the same value as branch.company.name and updates the value accordingly if it changes
     branch.company.name == :branch_company_name
