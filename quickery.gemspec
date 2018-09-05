@@ -13,16 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Implements Law of Demeter by mapping associated record attributes as own attributes (one-way read-only). Consequently, speeds up SQL queries by removing joins queries between intermediary models, at the cost of slower writes. This is an anti-normalization pattern in favour of actual data-redundancy and faster queries. Use this only as necessary.'
   spec.homepage      = 'https://github.com/jrpolidario/quickery'
   spec.license       = 'MIT'
-
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise 'RubyGems 2.0 or newer is required to protect against ' \
-      'public gem pushes.'
-  end
-
+  
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
