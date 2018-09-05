@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Implements Law of Demeter by mapping associated record attributes as own attributes (one-way read-only). Consequently, speeds up SQL queries by removing joins queries between intermediary models, at the cost of slower writes. This is an anti-normalization pattern in favour of actual data-redundancy and faster queries. Use this only as necessary.'
   spec.homepage      = 'https://github.com/jrpolidario/quickery'
   spec.license       = 'MIT'
-  
+
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activerecord'
-  spec.add_dependency 'activesupport'
+  spec.add_dependency 'activerecord', '~> 4.0'
+  spec.add_dependency 'activesupport', '~> 4.0'
 
   spec.add_development_dependency 'byebug', '~> 9.0'
   spec.add_development_dependency 'bundler', '~> 1.16'
