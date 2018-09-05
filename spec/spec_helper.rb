@@ -1,4 +1,4 @@
-require 'bundler'
+require 'bundler/setup'
 
 Bundler.require :default, :development
 
@@ -10,7 +10,6 @@ Combustion.initialize! :active_record do
   end
 end
 
-require 'bundler/setup'
 require 'rspec/rails'
 require 'quickery'
 
