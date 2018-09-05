@@ -1,39 +1,104 @@
 # Quickery
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/quickery`. To experiment with that code, run `bin/console` for an interactive prompt.
+## About
 
-TODO: Delete this and the text above, and describe your gem
+* Implements Law of Demeter by mapping associated record attributes as own attributes (one-way read-only)
+* Consequently, speeds up SQL queries by removing joins queries between intermediary models, at the cost of slower writes.
+* This is an anti-normalization pattern in favour of actual data-redundancy and faster queries. Use this only as necessary.
 
-## Installation
+## Dependencies
 
-Add this line to your application's Gemfile:
+* **Rails 4 or 5**
+* **(Rails 3 still untested)**
 
-```ruby
-gem 'quickery'
-```
+## Setup
+1. Add the following to your `Gemfile`:
 
-And then execute:
+    ```ruby
+    gem 'quickery', '~> 0.1'
+    ```
 
-    $ bundle
+2. Run:
 
-Or install it yourself as:
+    ```bash
+    bundle install
+    ```
 
-    $ gem install quickery
+## Usage Example
 
-## Usage
+  ```ruby
+  # app/models/employee.rb
+  class Employee < ApplicationRecord
+    # say we have the following attributes:
+    #   branch_id:integer
+    #   branch_company_name:string
+    belongs_to :branch
 
-TODO: Write usage instructions here
+    # feel free to rename :branch_company_name as you wish; it's just like any other attribute anyway
+    quickery do
+      branch.company.name == :branch_company_name
+    end
+  end
 
-## Development
+  # app/models/branch.rb
+  class Branch < ApplicationRecord
+    # say we have the following attributes:
+    #   company_id:integer
+    belongs_to :company
+  end
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+  # app/models/company.rb
+  class Company < ApplicationRecord
+    # say we have the following attributes:
+    #   name:string
+  end
+  ```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+  ```ruby
+  # rails console
+  company = Company.create!(name: 'Jollibee')
+  branch = Branch.create!(company: company)
+  employee = Employee.create!(branch: branch)
+
+  puts employee.branch_company_name
+  # => 'Jollibee'
+
+  # As you can see the `branch_company_name` attribute above has the same value as the associated record's attribute
+  # Now, let's try updating company, and you will see below that `branch_company_name` automatically gets updated as well
+
+  company.update!(name: 'Mang Inasal')
+
+  puts employee.branch_company_name
+  # => 'Jollibee'
+
+  # You need to reload the object, if you expect that it's been changed:
+  employee.reload
+
+  puts employee.branch_company_name
+  # => 'Mang Inasal'
+
+  # Now, let's try updating the intermediary association, and you will see below that `branch_company_name` would be updated accordingly
+  other_company = Company.create!(name: 'McDonalds')
+  branch.update!(company: other_company)
+
+  employee.reload
+
+  puts employee.branch_company_name
+  # => 'McDonalds'
+  ```
+
+## TODOs
+* Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 
 ## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/quickery.
+* pull requests and forks are very much welcomed! :) Let me know if you find any bug! Thanks
 
 ## License
+* MIT
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+## Developer Guide
+* see [developer_guide.md](developer_guide.md)
+
+## Changelog
+* 0.1.0
+  * initial beta release
