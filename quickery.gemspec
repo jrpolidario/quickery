@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Jules Roman Polidario']
   spec.email         = ['jrpolidario@gmail.com']
 
-  spec.summary       = 'Add association caches to speed up queries'
-  spec.description   = 'Add association caches to speed up queries'
+  spec.summary       = 'Database Anti-normalization pattern implementing Law of Demeter by mapping associated record attributes as own attributes (one-way read-only), and therefore improves query speeds at the cost of slower writes.'
+  spec.description   = 'Implements Law of Demeter by mapping associated record attributes as own attributes (one-way read-only). Consequently, speeds up SQL queries by removing joins queries between intermediary models, at the cost of slower writes. This is an anti-normalization pattern in favour of actual data-redundancy and faster queries. Use this only as necessary.'
   spec.homepage      = 'https://github.com/jrpolidario/quickery'
   spec.license       = 'MIT'
 
