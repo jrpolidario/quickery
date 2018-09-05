@@ -1,5 +1,6 @@
 class Employee < ApplicationRecord
   belongs_to :branch
+  belongs_to :category
   belongs_to :country, foreign_key: :branch_company_country_id
 
   quickery do

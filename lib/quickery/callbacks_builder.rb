@@ -48,9 +48,17 @@ module Quickery
       last_association_builder.model.class_exec do
 
         before_update do
-          byebug
           if changes.keys.include? dependee_column_name
             new_value = send(dependee_column_name)
+
+            dependent_records = last_association_builder._quickery_dependent_records(self)
+            dependent_records.update_all(depender_column_name => new_value)
+          end
+        end
+
+        before_destroy do
+          if attributes.keys.include? dependee_column_name
+            new_value = nil
 
             dependent_records = last_association_builder._quickery_dependent_records(self)
             dependent_records.update_all(depender_column_name => new_value)
@@ -61,7 +69,7 @@ module Quickery
 
     # also add callbacks to sync changes when intermediary associations have been changed (this does not include first and last builder)
     def add_callback_to_each_intermediate_model
-      last_association_builder = @quickery_builder.first_association_builder
+      last_association_builder = @quickery_builder.last_association_builder
       depender_column_name = @quickery_builder.depender_column_name
       dependee_column_name = @quickery_builder.dependee_column_name
 
@@ -80,6 +88,15 @@ module Quickery
               end
 
               dependent_records = association_builder._quickery_dependent_records(self)
+              dependent_records.update_all(depender_column_name => new_value)
+            end
+          end
+
+          before_destroy do
+            if attributes.keys.include? association_builder.belongs_to.foreign_key
+              new_value = nil
+
+              dependent_records = last_association_builder._quickery_dependent_records(self)
               dependent_records.update_all(depender_column_name => new_value)
             end
           end
