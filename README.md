@@ -54,6 +54,12 @@
   end
   ```
 
+  ```bash
+  # bash
+  rails generate migration add_branch_company_name_to_employees branch_company_name:string
+  bundle exec rake db:migrate
+  ```
+
   ```ruby
   # rails console
   company = Company.create!(name: 'Jollibee')
