@@ -157,8 +157,8 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 * inside the block you may define "quickery-defined attribute mappings";
   each mapping will create a `Quickery::QuickeryBuilder` object. i.e:
     * `branch.company.country.category.name == :branch_company_country_category_name`
-    * You are required to specify `belongs_to :branch` association in this model.
-    * Similarly, you are required to specify `belongs_to :company` inside `Branch` model, `belongs_to :country` inside `Company` model; etc...
+        * You are required to specify `belongs_to :branch` association in this model.
+        * Similarly, you are required to specify `belongs_to :company` inside `Branch` model, `belongs_to :country` inside `Company` model; etc...
 * each `Quickery::AssociationBuilder` defines a set of "hidden" `before_save`, `before_update`, `before_destroy`, and `before_create` callbacks across all models specified in the quickery-defined attribute association chain.
 * quickery-defined attributes such as say `:branch_company_country_category_name` are updated by Quickery automatically whenever any of it's dependent records across models have been changed. Note that updates in this way do not trigger model callbacks, as I wanted to isolate logic and scope of Quickery by not triggering model callbacks that you already have.
 * quickery-defined attributes such as say `:branch_company_country_category_name` are READ-only! Do not update these attributes manually. You can, but it will not automatically update the other end, and thus will break data integrity. If you want to re-update these attributes to match the other end, see `recreate_quickery_cache!` below.
@@ -175,7 +175,6 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 * useful if you already have records, and you want these old records to be updated immediately
 * i.e. you can do so something like the following:
     ```ruby
-    # rails console
     Employee.each do |employee|
       employee.recreate_quickery_cache!
     end
