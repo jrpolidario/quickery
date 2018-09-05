@@ -197,6 +197,7 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 
 ## TODOs
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
+* Improve "updates" across the quickery-defined model callbacks, by grouping attributes that will be updated and update in one go, instead of independently updating per each quickery-defined attribute
 
 ## Contributing
 * pull requests and forks are very much welcomed! :) Let me know if you find any bug! Thanks
