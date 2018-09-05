@@ -1,5 +1,8 @@
 # Quickery
 
+[![Build Status](https://travis-ci.org/jrpolidario/quickery.svg?branch=master)](https://travis-ci.org/jrpolidario/quickery)
+[![Gem Version](https://badge.fury.io/rb/quickery.svg)](https://badge.fury.io/rb/quickery)
+
 ## About
 
 * Implements Law of Demeter by mapping associated record attributes as own attributes (one-way read-only)
