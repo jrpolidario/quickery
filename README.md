@@ -31,7 +31,7 @@
 # app/models/employee.rb
 class Employee < ApplicationRecord
   # say we have the following attributes:
-  #   branch_id:integer
+  #   branch_id:bigint
   #   branch_company_name:string
   belongs_to :branch
 
@@ -56,7 +56,7 @@ end
 # app/models/branch.rb
 class Branch < ApplicationRecord
   # say we have the following attributes:
-  #   company_id:integer
+  #   company_id:bigint
   belongs_to :company
 end
 
@@ -110,7 +110,7 @@ If you already have "old" records before you've integrated quickery or if you ha
 
 ```ruby
 # rails console
-Employee.each do |employee|
+Employee.find_each do |employee|
   employee.recreate_quickery_cache!
 end
 ```
@@ -186,7 +186,7 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 * useful if you already have records, and you want these old records to be updated immediately
 * i.e. you can do so something like the following:
     ```ruby
-    Employee.each do |employee|
+    Employee.find_each do |employee|
       employee.recreate_quickery_cache!
     end
     ```
