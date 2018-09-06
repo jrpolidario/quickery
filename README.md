@@ -92,7 +92,7 @@ company.update!(name: 'Mang Inasal')
 puts employee.branch_company_name
 # => 'Jollibee'
 
-# You need to reload the object, if you expect that it's been changed:
+# You may or may not need to reload the object, depending on if you expect that it's been changed:
 employee.reload
 
 puts employee.branch_company_name
