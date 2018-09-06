@@ -3,8 +3,6 @@
 [![Build Status](https://travis-ci.org/jrpolidario/quickery.svg?branch=master)](https://travis-ci.org/jrpolidario/quickery)
 [![Gem Version](https://badge.fury.io/rb/quickery.svg)](https://badge.fury.io/rb/quickery)
 
-## About
-
 * Implements Law of Demeter by mapping associated record attributes as own attributes (one-way read-only)
 * Consequently, speeds up SQL queries by removing joins queries between intermediary models, at the cost of slower writes.
 * This is an anti-normalization pattern in favour of actual data-redundancy and faster queries. Use this only as necessary.
@@ -106,6 +104,15 @@ employee.reload
 
 puts employee.branch_company_name
 # => 'McDonalds'
+```
+
+If you already have "old" records before you've integrated quickery or if you have new quickery-defined attributes, you can update these stale records by using `recreate_quickery_cache!`. See example below:
+
+```ruby
+# rails console
+Employee.each do |employee|
+  employee.recreate_quickery_cache!
+end
 ```
 
 ## Usage Example 2
