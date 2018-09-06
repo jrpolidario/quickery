@@ -125,7 +125,7 @@ end
 # app/models/employee.rb
 class Employee < ApplicationRecord
   belongs_to :branch
-  belongs_to :country, foreign_key: :branch_company_id
+  belongs_to :company, foreign_key: :branch_company_id
 
   quickery do
     branch.company.id == :branch_company_id
