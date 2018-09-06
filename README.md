@@ -33,6 +33,7 @@ class Employee < ApplicationRecord
   # say we have the following attributes:
   #   branch_id:bigint
   #   branch_company_name:string
+
   belongs_to :branch
 
   quickery do
@@ -57,6 +58,7 @@ end
 class Branch < ApplicationRecord
   # say we have the following attributes:
   #   company_id:bigint
+
   belongs_to :company
 end
 
