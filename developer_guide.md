@@ -15,6 +15,15 @@ gem push quickery-X.X.X.gem
   * [combustion](https://github.com/pat/combustion)
   * [appraisal](https://github.com/thoughtbot/appraisal)
 
+### Setup
+
+```bash
+# setup development gems
+bundle install
+# setup Apprisal for testing different Rails versions below
+bundle exec appraisal install
+```
+
 ```bash
 # to auto-test specs whenever a spec file has been modified:
 bundle exec guard
