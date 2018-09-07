@@ -1,4 +1,3 @@
-require 'byebug'
 require 'active_support'
 
 module Quickery
