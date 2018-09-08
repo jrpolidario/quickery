@@ -218,6 +218,8 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 * see [developer_guide.md](developer_guide.md)
 
 ## Changelog
+* 0.1.2
+  * fixed require error for remnant debugging code: 'byebug'
 * 0.1.1
   * Gemspec fixes and travis build fixes.
 * 0.1.0
