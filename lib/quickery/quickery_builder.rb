@@ -21,6 +21,9 @@ module Quickery
 
       define_quickery_builders_in_model_class unless @model.respond_to? :quickery_builders
 
+      # prevent UPDATES to quickery-defined attribute
+      model.attr_readonly depender_column_name
+
       # include this to the list of quickery builders defined for this model
       @model.quickery_builders[depender_column_name] = self
     end

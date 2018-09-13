@@ -88,6 +88,53 @@ RSpec.describe Employee, type: :model do
     let!(:employee_3) { create(:employee) }
     let!(:employee_4) { create(:employee) }
 
+    context 'when quickery-defined attributes changed' do
+      before(:each) do
+        employee_1.branch_company_country_name = 'somenewvalue'
+        employee_1.branch_company_country_id = -1
+        employee_2.branch_company_country_name = 'somenewvalue'
+        employee_2.branch_company_country_id = -1
+        employee_3.branch_company_country_name = 'somenewvalue'
+        employee_3.branch_company_country_id = -1
+        employee_4.branch_company_country_name = 'somenewvalue'
+        employee_4.branch_company_country_id = -1
+      end
+
+      it 'does not persist changes because read-only' do
+        employee_1.tap do |employee|
+          employee.save!
+          employee.reload
+
+          expect(employee.branch_company_country_name).to_not eq 'somenewvalue'
+          expect(employee.branch_company_country_id).to_not eq -1
+        end
+
+        employee_2.tap do |employee|
+          employee.save!
+          employee.reload
+
+          expect(employee.branch_company_country_name).to_not eq 'somenewvalue'
+          expect(employee.branch_company_country_id).to_not eq -1
+        end
+
+        employee_3.tap do |employee|
+          employee.save!
+          employee.reload
+
+          expect(employee.branch_company_country_name).to_not eq 'somenewvalue'
+          expect(employee.branch_company_country_id).to_not eq -1
+        end
+
+        employee_4.tap do |employee|
+          employee.save!
+          employee.reload
+
+          expect(employee.branch_company_country_name).to_not eq 'somenewvalue'
+          expect(employee.branch_company_country_id).to_not eq -1
+        end
+      end
+    end
+
     context 'when quickery-defined foreign_key attributes not changed' do
       before(:each) do
         employee_1.name = 'emp1'

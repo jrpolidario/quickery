@@ -235,6 +235,7 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 ## Changelog
 * 0.1.3
   * fixed Quickery not always working properly because of Rails autoloading; fixed by eager loading all Models (`app/models/*/**/*.rb`)
+  * add `attr_readonly` for Quickery-defined attributes to prevent being updated intentionally or unintentionally
 * 0.1.2
   * fixed require error for remnant debugging code: 'byebug'
 * 0.1.1
