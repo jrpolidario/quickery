@@ -11,6 +11,7 @@
 
 * **Rails 4 or 5**
 * **(Rails 3 still untested)**
+* `ActiveRecord`
 
 ## Setup
 1. Add the following to your `Gemfile`:
@@ -207,15 +208,29 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 ## TODOs
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 * Improve "updates" across the quickery-defined model callbacks, by grouping attributes that will be updated and update in one go, instead of independently updating per each quickery-defined attribute
+* Add `attr_readonly` for quickery-defined attributes.
 
-## Contributing
-* pull requests and forks are very much welcomed! :) Let me know if you find any bug! Thanks
+## Other Similar Gems
+See [my detailed comparisons](other_similar_gems_comparison.md)
+
+* [persistize](https://github.com/bebanjo/persistize)
+* [activerecord-denormalize](https://github.com/ursm/activerecord-denormalize)
+* [flattery](https://github.com/evendis/flattery)
 
 ## License
 * MIT
 
 ## Developer Guide
 * see [developer_guide.md](developer_guide.md)
+
+## Contributing
+* pull requests and forks are very much welcomed! :) Let me know if you find any bug! Thanks
+
+1. Fork it
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin my-new-feature)
+5. Create new Pull Request
 
 ## Changelog
 * 0.1.1
