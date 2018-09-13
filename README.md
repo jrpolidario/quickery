@@ -232,6 +232,8 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 0.1.4
+  * add `railstie` as dependency to fix undefined constant error
 * 0.1.3
   * fixed Quickery not always working properly because of Rails autoloading; fixed by eager loading all Models (`app/models/*/**/*.rb`)
 * 0.1.2
