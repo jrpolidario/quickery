@@ -35,7 +35,7 @@
       # for as many number of tasks records that belongs to the `project` above, the `update` above will also have the same number of SQL update queries, and can be very slow:
       # SQL (0.1ms) UPDATE "tasks" SET "project_name" = $1 WHERE "tasks"."id" = $2 [["project_name", "newprojectname"], ["id", 1]]
       # SQL (0.1ms) UPDATE "tasks" SET "project_name" = $1 WHERE "tasks"."id" = $2 [["project_name", "newprojectname"], ["id", 2]]
-    ```
+      ```
 
     * because you are using custom methods in persistize, every time you update any of the `depending_on` records, the methods you defined are executed even if the updated attribute/s are not depended upon by the methods: i.e. extending from `persistize` github page:
 
@@ -115,14 +115,14 @@
     * Rails 5 is not part of its supported list in their github page. And just to try it out on a Rails 5 app, `Flattery::ValueProvider` did not seem to work, because values are not pushed to the `:notes`'s `:category_name` values.
     * Using Rails 4, does not support nested associated dependencies for `belongs_to`:
 
-    ```ruby
-    class Note < ActiveRecord::Base
-      belongs_to :category, :inverse_of => :notes
+      ```ruby
+      class Note < ActiveRecord::Base
+        belongs_to :category, :inverse_of => :notes
 
-      include Flattery::ValueCache
-      # one-level works:
-      flatten_value category: :name
-      # nested not supported:
-      flatten_value category: { user: :email }
-    end
-    ```
+        include Flattery::ValueCache
+        # one-level works:
+        flatten_value category: :name
+        # nested not supported:
+        flatten_value category: { user: :email }
+      end
+      ```
