@@ -126,7 +126,7 @@ end
 # app/models/employee.rb
 class Employee < ApplicationRecord
   belongs_to :branch
-  belongs_to :country, foreign_key: :branch_company_id
+  belongs_to :company, foreign_key: :branch_company_id
 
   quickery do
     branch.company.id == :branch_company_id
@@ -233,6 +233,8 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 0.1.2
+  * fixed require error for remnant debugging code: 'byebug'
 * 0.1.1
   * Gemspec fixes and travis build fixes.
 * 0.1.0
