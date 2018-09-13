@@ -102,9 +102,9 @@
 
 * [activerecord-denormalize v0.2.0](https://github.com/ursm/activerecord-denormalize) :
   * Pros against Quickery:
-    * **possibly there are pros, but because I could not test this because it seems to not support Rails 4 and 5 (see cons below)**
+    * *possibly there are pros, but because I could not test this because it seems to not support Rails 4 and 5 (see cons below)*
   * Cons against Quickery:
-    * Rails 5 seems to be not supported (most likely because last commit was 6 years ago). I was getting `Gem Load Error is: wrong number of arguments (given 0, expected 1)` when doing `rails g model messager sender:references{polymorphic} _sender:hstore`
+    * Rails 5 seems to be not supported (most likely because last commit was 6 years ago). I was getting `Gem Load Error is: wrong number of arguments (given 0, expected 1)` when doing `rails g model message sender:references{polymorphic} _sender:hstore`
     * Rails 4 seems to be also not supported. I was getting `ArgumentError (wrong number of arguments (given 1, expected 0))` when doing `User.create` inside rails console.
 
 * [flattery v0.1.0](https://github.com/evendis/flattery) :
