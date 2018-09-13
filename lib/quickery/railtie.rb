@@ -1,3 +1,5 @@
+require 'rails/railtie'
+
 module Quickery
   class Railtie < Rails::Railtie
     # Need to eager load all models so that all quickery callbacks and dependencies will be considered
