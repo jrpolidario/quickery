@@ -213,6 +213,10 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 ## TODOs
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 * Improve "updates" across the quickery-defined model callbacks, by grouping attributes that will be updated and update in one go, instead of independently updating per each quickery-defined attribute
+* Support `has_many` as currently only `belongs_to` is supported. This would then allow us to cache Array of values.
+* Support custom-methods-values like [`persistize`](https://github.com/bebanjo/persistize), if it's easy enough to integrate something similar
+* Support background-processing like in [`flattery`](https://github.com/evendis/flattery)
+* Change Quickery DSL from a block implementation into a Hash as suggested by @xire28 and @sshaw_ in my [reddit post](https://www.reddit.com/r/ruby/comments/9dlcc5/i_just_published_a_new_gem_quickery_an/)
 
 ## Other Similar Gems
 See [my detailed comparisons](other_similar_gems_comparison.md)
