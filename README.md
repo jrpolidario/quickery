@@ -41,6 +41,7 @@ class Employee < ApplicationRecord
     # TL;DR: the following line means:
     #   make sure that this record's `branch_company_name` attribute will always have
     #   the same value as branch.company.name and updates the value accordingly if it changes
+
     branch.company.name == :branch_company_name
 
     # feel free to rename :branch_company_name as you wish; it's just like any other attribute anyway
@@ -136,7 +137,7 @@ end
 
 ```bash
 # bash
-rails generate migration add_branch_company_id_to_employees branch_company_id:bigint
+rails generate migration add_branch_company_id_to_employees branch_company_id:bigint:index
 bundle exec rake db:migrate
 ```
 
@@ -157,6 +158,10 @@ puts Employee.where(company: company)
 puts Employee.joins(branch: :company).where(companies: { id: company.id })
 # => [#<Employee id: 1>]
 ```
+
+## Gotchas
+* Quickery makes use of Rails model callbacks such as `before_save`. This meant that data-integrity holds unless `update_columns` or `update_column` is used which bypasses model callbacks, or unless any manual SQL update is performed.
+* Quickery does not automatically update old records existing in the database that were created before you integrate Quickery, or before you add new/more Quickery-attributes for that model. One solution is [`recreate_quickery_cache!`](#recreate_quickery_cache) below.
 
 ## DSL
 
