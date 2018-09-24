@@ -150,11 +150,13 @@ employee = Employee.create!(branch: branch)
 puts employee.branch_company_id
 # => 1
 
+puts employee.company
+# => #<Company id: 1 name: 'Jollibee'>
+
 puts Employee.where(company: company)
 # => [#<Employee id: 1>]
 
 # as you may notice, the query above is a lot simpler and faster instead of doing it normally like below (if not using Quickery)
-# you may however still use belongs_to `:through` to achieve the simplified query like above, but it's still a lot slower because of JOINS
 puts Employee.joins(branch: :company).where(companies: { id: company.id })
 # => [#<Employee id: 1>]
 ```
