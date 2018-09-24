@@ -157,6 +157,7 @@ puts Employee.where(company: company)
 # => [#<Employee id: 1>]
 
 # as you may notice, the query above is a lot simpler and faster instead of doing it normally like below (if not using Quickery)
+# you may however still use `has_many :through` to achieve a simplified code: `company.employees`, but it's still a lot slower because of JOINS
 puts Employee.joins(branch: :company).where(companies: { id: company.id })
 # => [#<Employee id: 1>]
 ```
