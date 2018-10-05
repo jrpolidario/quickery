@@ -15,14 +15,20 @@ module Quickery
     end
 
     def ==(depender_column_name)
+      define_quickery_builders_in_model_class unless @model.respond_to? :quickery_builders
+      # define_quickery_association_builders_in_model_class unless @model.respond_to? :quickery_association_builder_dependers
+
       @depender_column_name = depender_column_name
 
       @callbacks_builder = CallbacksBuilder.new(quickery_builder: self)
 
-      define_quickery_builders_in_model_class unless @model.respond_to? :quickery_builders
-
       # include this to the list of quickery builders defined for this model
       @model.quickery_builders[depender_column_name] = self
+
+      puts 'RRRRRRRRRRRRRR'
+      puts depender_column_name
+
+      # add_quickery_callbacks_to_model_class
     end
 
     private
@@ -37,5 +43,25 @@ module Quickery
         end
       end
     end
+
+    # def define_quickery_association_builders_in_model_class
+    #   @model.class_eval do
+    #     @quickery_association_builder_dependers = []
+    #     @quickery_association_builder_dependees = []
+    #     @quickery_association_builder_intermediaries = []
+    #
+    #     class << self
+    #       attr_accessor :quickery_association_builder_dependers
+    #       attr_accessor :quickery_association_builder_dependees
+    #       attr_accessor :quickery_association_builder_intermediaries
+    #     end
+    #   end
+    # end
+
+    # def add_quickery_callbacks_to_model_class
+    #   @model.before_create :quickery_before_create_callback
+    #   @model.before_update :quickery_before_update_callback
+    #   @model.before_destroy :quickery_before_destroy_callback
+    # end
   end
 end

@@ -1,5 +1,5 @@
 module Quickery
-  class AssociationBuilder
+  class Block
     attr_reader :model
     attr_reader :parent_builder
     attr_reader :child_builder

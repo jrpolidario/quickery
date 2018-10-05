@@ -2,27 +2,27 @@ require 'rails_helper'
 
 RSpec.describe Branch, type: :model do
   describe 'after update' do
-    let!(:country_1) { create(:country, name: 'United States of Earth') }
-    let!(:country_2) { create(:country, name: 'Valhalla') }
-    let!(:company_1) { create(:company, country: country_1) }
-    let!(:company_2) { create(:company, country: country_2) }
-    let!(:branch_1) { create(:branch, company: company_1) }
-    let!(:branch_2) { create(:branch, company: company_2) }
-    let!(:employee_1) { create(:employee, branch: branch_1) }
-    let!(:employee_2) { create(:employee, branch: branch_2) }
-    let!(:employee_3) { create(:employee, branch: branch_2) }
-    let!(:employee_4) { create(:employee, branch: nil) }
+    # let!(:country_1) { create(:country, name: 'United States of Earth') }
+    # let!(:country_2) { create(:country, name: 'Valhalla') }
+    # let!(:company_1) { create(:company, country: country_1) }
+    # let!(:company_2) { create(:company, country: country_2) }
+    # let!(:branch_1) { create(:branch, company: company_1) }
+    # let!(:branch_2) { create(:branch, company: company_2) }
+    # let!(:employee_1) { create(:employee, branch: branch_1) }
+    # let!(:employee_2) { create(:employee, branch: branch_2) }
+    # let!(:employee_3) { create(:employee, branch: branch_2) }
+    # let!(:employee_4) { create(:employee, branch: nil) }
     let!(:employee_5) { create(:employee, branch: create(:branch)) }
 
     context 'when quickery-defined foreign_key attribute is changed' do
-      before(:each) do
-        branch_1.company = company_2
-        branch_2.company = company_1
-      end
+      # before(:each) do
+      #   branch_1.company = company_2
+      #   branch_2.company = company_1
+      # end
 
-      it 'updates nested children records that have quickery-defined attributes' do
-        expect(employee_4.branch_company_country_name).to eq nil
-        expect(employee_4.branch_company_country_id).to eq nil
+      it 'updates nested children records that have quickery-defined attributes', :focus do
+        # expect(employee_4.branch_company_country_name).to eq nil
+        # expect(employee_4.branch_company_country_id).to eq nil
         expect(employee_5.branch_company_country_name).to_not eq nil
         expect(employee_5.branch_company_country_id).to_not eq nil
 
