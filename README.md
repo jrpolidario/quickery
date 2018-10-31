@@ -185,7 +185,7 @@ end
 ```
 
 ## Gotchas
-* Quickery makes use of Rails model callbacks such as `before_save`. This meant that data-integrity holds unless `update_columns` or `update_column` is used which bypasses model callbacks, or unless any manual SQL update is performed.
+* Quickery makes use of Rails model callbacks such as `before_update`. This meant that data-integrity holds unless `update_columns` or `update_column` is used which bypasses model callbacks, or unless any manual SQL update is performed.
 * Quickery does not automatically update old records existing in the database that were created before you integrate Quickery, or before you add new/more Quickery-attributes for that model. One solution is [`recreate_quickery_cache!`](#recreate_quickery_cache) below.
 
 ## DSL
