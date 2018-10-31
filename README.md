@@ -17,7 +17,7 @@
 1. Add the following to your `Gemfile`:
 
     ```ruby
-    gem 'quickery', '~> 0.1'
+    gem 'quickery', '~> 1.0'
     ```
 
 2. Run:
@@ -37,23 +37,13 @@ class Employee < ApplicationRecord
 
   belongs_to :branch
 
-  quickery do
-    # TL;DR: the following line means:
-    #   make sure that this record's `branch_company_name` attribute will always have
-    #   the same value as branch.company.name and updates the value accordingly if it changes
+  # TL;DR: the following line means:
+  #   make sure that this record's `branch_company_name` attribute will always have the same value as
+  #   branch.company.name and auto-updates the value if it (or any associated record in between) changes
 
-    branch.company.name == :branch_company_name
+  quickery branch: { company: { name: :branch_company_name } }
 
-    # feel free to rename :branch_company_name as you wish; it's just like any other attribute anyway
-    # the == is a custom overloaded operator; it does not mean "is equal" but means "should equal to"
-    # branch.company.name is a fluid expression that defines the attribute dependency
-    #   `branch` and `company` does not mean `branch` and `company` record
-
-    # you may add more inside this quickery-block: i.e:
-    #   branch.name == :branch_name
-    #   branch.id == :branch_id
-    #   branch.company.country.name == :branch_company_country_name
-  end
+  # feel free to rename :branch_company_name as you wish; it's just like any other attribute anyway
 end
 
 # app/models/branch.rb
@@ -127,11 +117,9 @@ end
 # app/models/employee.rb
 class Employee < ApplicationRecord
   belongs_to :branch
-  belongs_to :company, foreign_key: :branch_company_id
+  belongs_to :company, foreign_key: :branch_company_id, optional: true
 
-  quickery do
-    branch.company.id == :branch_company_id
-  end
+  quickery { branch: { company: { id: :branch_company_id } } }
 end
 ```
 
@@ -162,6 +150,40 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 # => [#<Employee id: 1>]
 ```
 
+## Other Usage Examples
+
+```ruby
+# app/models/employee.rb
+class Employee < ApplicationRecord
+  # multiple-attributes and/or multiple-associations; as many, and as deep as you wish
+  quickery(
+    branch: {
+      name: :branch_name,
+      address: :branch_address,
+      company: {
+        name: :branch_company_name
+      }
+    },
+    user: {
+      first_name: :user_first_name,
+      last_name: :user_last_name
+    }
+  )
+end
+```
+
+```ruby
+# app/models/employee.rb
+class Employee < ApplicationRecord
+  # `quickery` can be called multiple times
+  quickery { branch: { name: :branch_name } }
+  quickery { branch: { address: :branch_address } }
+  quickery { branch: { company: { name: :branch_company_name } } }
+  quickery { user: { first_name: :user_first_name } }
+  quickery { user: { last_name: :user_last_name } }
+end
+```
+
 ## Gotchas
 * Quickery makes use of Rails model callbacks such as `before_save`. This meant that data-integrity holds unless `update_columns` or `update_column` is used which bypasses model callbacks, or unless any manual SQL update is performed.
 * Quickery does not automatically update old records existing in the database that were created before you integrate Quickery, or before you add new/more Quickery-attributes for that model. One solution is [`recreate_quickery_cache!`](#recreate_quickery_cache) below.
@@ -170,18 +192,18 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 
 ### For any subclass of `ActiveRecord::Base`:
 
+* defines a set of "hidden" Quickery `before_create`, `before_update`, and `before_destroy` callbacks needed by Quickery to perform the "syncing" of attribute values
+
 #### Class Methods:
 
-##### `quickery(&block)`
-* returns a `Quickery::AssociationBuilder` object
-* block is executed in the context of the `Quickery::AssociationBuilder` object,
-  which means that you cannot access the model instance inside the block, as you are not supposed to.
-* inside the block you may define "quickery-defined attribute mappings";
-  each mapping will create a `Quickery::QuickeryBuilder` object. i.e:
-    * `branch.company.country.category.name == :branch_company_country_category_name`
-        * You are required to specify `belongs_to :branch` association in this model.
+##### `quickery(mappings)`
+* mappings (Hash)
+  * each mapping will create a `Quickery::QuickeryBuilder` object. i.e:
+    * `{ branch: { name: :branch_name }` will create one `Quickery::QuickeryBuilder`, while
+    * `{ branch: { name: :branch_name, id: :branch_id }` will create two `Quickery::QuickeryBuilder`
+        * In this particular example, you are required to specify `belongs_to :branch` in this model
         * Similarly, you are required to specify `belongs_to :company` inside `Branch` model, `belongs_to :country` inside `Company` model; etc...
-* each `Quickery::AssociationBuilder` defines a set of "hidden" `before_save`, `before_update`, `before_destroy`, and `before_create` callbacks across all models specified in the quickery-defined attribute association chain.
+* defines a set of "hidden" Quickery `before_save`, `before_update`, `before_destroy`, and `before_create` callbacks across all models specified in the quickery-defined attribute association chain.
 * quickery-defined attributes such as say `:branch_company_country_category_name` are updated by Quickery automatically whenever any of it's dependent records across models have been changed. Note that updates in this way do not trigger model callbacks, as I wanted to isolate logic and scope of Quickery by not triggering model callbacks that you already have.
 * quickery-defined attributes such as say `:branch_company_country_category_name` are READ-only! Do not update these attributes manually. You can, but it will not automatically update the other end, and thus will break data integrity. If you want to re-update these attributes to match the other end, see `recreate_quickery_cache!` below.
 
@@ -215,11 +237,9 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 
 ## TODOs
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
-* Improve "updates" across the quickery-defined model callbacks, by grouping attributes that will be updated and update in one go, instead of independently updating per each quickery-defined attribute
 * Support `has_many` as currently only `belongs_to` is supported. This would then allow us to cache Array of values.
 * Support custom-methods-values like [`persistize`](https://github.com/bebanjo/persistize), if it's easy enough to integrate something similar
 * Support background-processing like in [`flattery`](https://github.com/evendis/flattery)
-* Change Quickery DSL from a block implementation into a Hash as suggested by @xire28 and @sshaw_ in my [reddit post](https://www.reddit.com/r/ruby/comments/9dlcc5/i_just_published_a_new_gem_quickery_an/)
 
 ## Other Similar Gems
 See [my detailed comparisons](other_similar_gems_comparison.md)
@@ -244,6 +264,9 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 1.0.0
+  * Done (TODO): DSL changed from quickery (block) into quickery (hash). Thanks to @xire28 and @sshaw_ in my [reddit post](https://www.reddit.com/r/ruby/comments/9dlcc5/i_just_published_a_new_gem_quickery_an/) for the suggestion.
+  * Done (TODO): Now updates in one go, instead of updating record per quickery-attribute, thereby greatly improving speed.
 * 0.1.4
   * add `railstie` as dependency to fix undefined constant error
 * 0.1.3

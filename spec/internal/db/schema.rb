@@ -40,6 +40,7 @@ ActiveRecord::Schema.define do
     t.bigint 'branch_id'
     t.bigint 'category_id'
     t.string 'branch_company_country_name'
+    t.string 'branch_company_name'
     t.integer 'branch_company_country_id'
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false

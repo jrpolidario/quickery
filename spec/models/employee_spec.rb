@@ -16,6 +16,7 @@ RSpec.describe Employee, type: :model do
         employee_4.tap do |employee|
           expect(employee.branch_company_country_name).to be nil
           expect(employee.branch_company_country_id).to be nil
+          expect(employee.branch_company_name).to be nil
 
           employee.save!
           employee.reload
@@ -24,6 +25,7 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to be nil
           expect(employee.branch_company_country_id).to be nil
+          expect(employee.branch_company_name).to be nil
         end
       end
     end
@@ -37,6 +39,7 @@ RSpec.describe Employee, type: :model do
         employee_1.tap do |employee|
           expect(employee.branch_company_country_name).to be nil
           expect(employee.branch_company_country_id).to be nil
+          expect(employee.branch_company_name).to be nil
 
           employee.save!
           employee.reload
@@ -45,11 +48,13 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq 'United States of Earth'
           expect(employee.branch_company_country_id).to eq country_1.id
+          expect(employee.branch_company_name).to eq company_1.name
         end
 
         employee_2.tap do |employee|
           expect(employee.branch_company_country_name).to be nil
           expect(employee.branch_company_country_id).to be nil
+          expect(employee.branch_company_name).to be nil
 
           employee.save!
           employee.reload
@@ -58,11 +63,13 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq 'Valhalla'
           expect(employee.branch_company_country_id).to eq country_2.id
+          expect(employee.branch_company_name).to eq company_2.name
         end
 
         employee_3.tap do |employee|
           expect(employee.branch_company_country_name).to be nil
           expect(employee.branch_company_country_id).to be nil
+          expect(employee.branch_company_name).to be nil
 
           employee.save!
           employee.reload
@@ -71,6 +78,7 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq 'Valhalla'
           expect(employee.branch_company_country_id).to eq country_2.id
+          expect(employee.branch_company_name).to eq company_2.name
         end
       end
     end
@@ -145,6 +153,7 @@ RSpec.describe Employee, type: :model do
           branch_was = Branch.find(employee.branch_id_was)
           expect(employee.branch_company_country_name).to eq branch_was.company.country.name
           expect(employee.branch_company_country_id).to eq branch_was.company.country.id
+          expect(employee.branch_company_name).to eq branch_was.company.name
 
           employee.save!
           employee.reload
@@ -153,12 +162,14 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq 'United States of Earth'
           expect(employee.branch_company_country_id).to eq country_1.id
+          expect(employee.branch_company_name).to eq company_1.name
         end
 
         employee_2.tap do |employee|
           branch_was = Branch.find(employee.branch_id_was)
           expect(employee.branch_company_country_name).to eq branch_was.company.country.name
           expect(employee.branch_company_country_id).to eq branch_was.company.country.id
+          expect(employee.branch_company_name).to eq branch_was.company.name
 
           employee.save!
           employee.reload
@@ -167,12 +178,14 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq 'Valhalla'
           expect(employee.branch_company_country_id).to eq country_2.id
+          expect(employee.branch_company_name).to eq company_2.name
         end
 
         employee_3.tap do |employee|
           branch_was = Branch.find(employee.branch_id_was)
           expect(employee.branch_company_country_name).to eq branch_was.company.country.name
           expect(employee.branch_company_country_id).to eq branch_was.company.country.id
+          expect(employee.branch_company_name).to eq branch_was.company.name
 
           employee.save!
           employee.reload
@@ -181,12 +194,14 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq 'Valhalla'
           expect(employee.branch_company_country_id).to eq country_2.id
+          expect(employee.branch_company_name).to eq company_2.name
         end
 
         employee_4.tap do |employee|
           branch_was = Branch.find(employee.branch_id_was)
           expect(employee.branch_company_country_name).to eq branch_was.company.country.name
           expect(employee.branch_company_country_id).to eq branch_was.company.country.id
+          expect(employee.branch_company_name).to eq branch_was.company.name
 
           employee.save!
           employee.reload
@@ -195,6 +210,7 @@ RSpec.describe Employee, type: :model do
 
           expect(employee.branch_company_country_name).to eq nil
           expect(employee.branch_company_country_id).to eq nil
+          expect(employee.branch_company_name).to eq nil
         end
       end
     end
