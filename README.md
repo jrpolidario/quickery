@@ -234,6 +234,16 @@ end
     # => 'Ireland'
     ```
 
+##### `determine_quickery_values`
+* returns a Hash of all quickery-defined attributes mapped to the current "actual" supposed values
+* i.e. you can do something like the following:
+
+    ```ruby
+    employee = Employee.first
+    puts employee.determine_quickery_values
+    # => { branch_company_country_id: 1, branch_compnay_country_name: 'Ireland' }
+    ```
+
 ## TODOs
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 * Support `has_many` as currently only `belongs_to` is supported. This would then allow us to cache Array of values.
@@ -263,6 +273,9 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 1.1.0
+  * added helper method [`determine_quickery_values`](#determine_quickery_values)
+  * fixed `recreate_quickery_cache!` raising `NilClass` error when the immediate association is nil
 * 1.0.0
   * Done (TODO): DSL changed from quickery (block) into quickery (hash). Thanks to @xire28 and @sshaw_ in my [reddit post](https://www.reddit.com/r/ruby/comments/9dlcc5/i_just_published_a_new_gem_quickery_an/) for the suggestion.
   * Done (TODO): Now updates in one go, instead of updating record per quickery-attribute, thereby greatly improving speed.

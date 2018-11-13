@@ -215,4 +215,87 @@ RSpec.describe Employee, type: :model do
       end
     end
   end
+
+  context 'class methods' do
+    describe 'quickery_builders' do
+      it 'returns a Hash of "quickery attribute" => Quickery::QuickeryBuilder objects' do
+        expect(Employee.quickery_builders.keys).to eq [:branch_company_country_name, :branch_company_country_id, :branch_company_name]
+        expect(Employee.quickery_builders.values).to all be_a(Quickery::QuickeryBuilder)
+      end
+    end
+
+    describe 'recreate_quickery_cache!' do
+      let!(:country) { create(:country, name: 'United States of Earth') }
+      let!(:company) { create(:company, country: country) }
+      let!(:branch) { create(:branch, company: company) }
+
+      it 'updates all quickery-attributes to current correct mapped values' do
+        employee = Employee.create
+        employee.update_columns(branch_id: branch.id)
+
+        expect(employee.reload.branch_company_country_id).to be nil
+        expect(employee.reload.branch_company_country_name).to be nil
+
+        employee.recreate_quickery_cache!
+
+        expect(employee.reload.branch_company_country_id).to eq country.id
+        expect(employee.reload.branch_company_country_name).to eq country.name
+      end
+    end
+  end
+
+  context 'instance methods' do
+    let(:employee) { create(:employee, branch_id: nil) }
+
+    describe 'recreate_quickery_cache!' do
+      let!(:country) { create(:country, name: 'United States of Earth') }
+      let!(:company) { create(:company, country: country) }
+      let!(:branch) { create(:branch, company: company) }
+
+      it 'updates all quickery-attributes to current correct mapped values' do
+        employee.update_columns(branch_id: branch.id)
+
+        expect(employee.reload.branch_company_country_id).to be nil
+        expect(employee.reload.branch_company_country_name).to be nil
+
+        employee.recreate_quickery_cache!
+
+        expect(employee.reload.branch_company_country_id).to eq country.id
+        expect(employee.reload.branch_company_country_name).to eq country.name
+      end
+    end
+
+    describe 'determine_quickery_value' do
+      let!(:country) { create(:country, name: 'United States of Earth') }
+      let!(:company) { create(:company, country: country) }
+      let!(:branch) { create(:branch, company: company) }
+
+      it 'returns current correct mapped value' do
+        employee.branch = branch
+        expect(employee.determine_quickery_value(:branch_company_country_id)).to eq country.id
+        expect(employee.determine_quickery_value(:branch_company_country_name)).to eq country.name
+        expect(employee.branch_company_country_id).to eq nil
+        expect(employee.branch_company_country_name).to eq nil
+      end
+    end
+
+    describe 'determine_quickery_values' do
+      let!(:country) { create(:country, name: 'United States of Earth') }
+      let!(:company) { create(:company, country: country) }
+      let!(:branch) { create(:branch, company: company) }
+
+      it 'returns current correct mapped value' do
+        employee.branch = branch
+        quickery_values = employee.determine_quickery_values
+        expect(quickery_values[:branch_company_country_id]).to eq country.id
+        expect(quickery_values[:branch_company_country_name]).to eq country.name
+        expect(quickery_values[:branch_company_name]).to eq company.name
+        expect(employee.branch_company_country_id).to eq nil
+        expect(employee.branch_company_country_name).to eq nil
+        expect(employee.branch_company_name).to eq nil
+      end
+    end
+
+    # TODO
+  end
 end

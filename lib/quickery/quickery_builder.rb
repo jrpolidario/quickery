@@ -13,8 +13,7 @@ module Quickery
     end
 
     def add_to_model
-      define_quickery_builders_in_model_class unless @model.respond_to? :quickery_builders
-      # include this to the list of quickery builders defined for this model
+      @model.quickery_builders ||= {}
       @model.quickery_builders[depender_column_name] = self
     end
 
@@ -27,19 +26,6 @@ module Quickery
     def create_model_callbacks
       @callbacks_builder = CallbacksBuilder.new(quickery_builder: self)
       @callbacks_builder.build_callbacks
-    end
-
-    private
-
-    def define_quickery_builders_in_model_class
-      # set default empty Hash if first time setting quickery_builders
-      @model.class_eval do
-        @quickery_builders = {}
-
-        class << self
-          attr_reader :quickery_builders
-        end
-      end
     end
   end
 end

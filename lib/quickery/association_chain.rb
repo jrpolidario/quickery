@@ -79,7 +79,7 @@ module Quickery
 
       child_association_chains(include_self: true).inject(from_record) do |from_record, association_chain|
         if association_chain.belongs_to
-          from_record.send(association_chain.belongs_to.name)
+          from_record.send(association_chain.belongs_to.name) if from_record
         else
           from_record
         end
