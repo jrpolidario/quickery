@@ -223,25 +223,6 @@ RSpec.describe Employee, type: :model do
         expect(Employee.quickery_builders.values).to all be_a(Quickery::QuickeryBuilder)
       end
     end
-
-    describe 'recreate_quickery_cache!' do
-      let!(:country) { create(:country, name: 'United States of Earth') }
-      let!(:company) { create(:company, country: country) }
-      let!(:branch) { create(:branch, company: company) }
-
-      it 'updates all quickery-attributes to current correct mapped values' do
-        employee = Employee.create
-        employee.update_columns(branch_id: branch.id)
-
-        expect(employee.reload.branch_company_country_id).to be nil
-        expect(employee.reload.branch_company_country_name).to be nil
-
-        employee.recreate_quickery_cache!
-
-        expect(employee.reload.branch_company_country_id).to eq country.id
-        expect(employee.reload.branch_company_country_name).to eq country.name
-      end
-    end
   end
 
   context 'instance methods' do
