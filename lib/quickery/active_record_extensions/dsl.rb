@@ -18,6 +18,21 @@ module Quickery
           mappings_builder = MappingsBuilder.new(model: self, mappings: mappings.with_indifferent_access)
           mappings_builder.map_attributes
         end
+
+        # subclass overrideable
+        def quickery_before_create_or_update(dependent_record, new_values)
+          dependent_record.assign_attributes(new_values)
+        end
+
+        # subclass overrideable
+        def quickery_before_association_update(dependent_records, record_to_be_updated, new_values)
+          dependent_records.update_all(new_values)
+        end
+
+        # subclass overrideable
+        def quickery_before_association_destroy(dependent_records, record_to_be_destroyed, new_values)
+          dependent_records.update_all(new_values)
+        end
       end
 
       module InstanceMethods

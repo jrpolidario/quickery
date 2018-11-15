@@ -24,6 +24,8 @@ module Quickery
           changed_attributes = changes.keys
 
           if model.quickery_association_chain_dependers.present?
+            new_values = {}.with_indifferent_access
+
             model.quickery_association_chain_dependers.each do |association_chain_depender|
               quickery_builder = association_chain_depender.quickery_builder
               depender_column_name = quickery_builder.depender_column_name
@@ -37,9 +39,11 @@ module Quickery
                   new_value = dependee_record.send(dependee_column_name)
                 end
 
-                assign_attributes(depender_column_name => new_value)
+                new_values[depender_column_name] = new_value
               end
             end
+
+            self.class.quickery_before_create_or_update(self, new_values)
           end
         end
 
@@ -48,6 +52,8 @@ module Quickery
           changed_attributes = changes.keys
 
           if model.quickery_association_chain_dependers.present?
+            new_values = {}.with_indifferent_access
+
             model.quickery_association_chain_dependers.each do |association_chain_depender|
               quickery_builder = association_chain_depender.quickery_builder
               depender_column_name = quickery_builder.depender_column_name
@@ -61,12 +67,14 @@ module Quickery
                   new_value = dependee_record.send(dependee_column_name)
                 end
 
-                assign_attributes(depender_column_name => new_value)
+                new_values[depender_column_name] = new_value
               end
             end
+
+            self.class.quickery_before_create_or_update(self, new_values)
           end
 
-          dependent_records_attributes_to_be_updated = {}
+          dependent_records_attributes_to_be_updated = {}.with_indifferent_access
 
           if model.quickery_association_chain_dependees.present?
             model.quickery_association_chain_dependees.each do |association_chain_dependee|
@@ -79,9 +87,9 @@ module Quickery
 
                 dependent_records = association_chain_dependee.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
               end
             end
@@ -103,9 +111,9 @@ module Quickery
 
                 dependent_records = association_chain_intermediary.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
               end
             end
@@ -115,14 +123,14 @@ module Quickery
             dependent_records = hash.fetch(:dependent_records)
             new_values = hash.fetch(:new_values)
 
-            dependent_records.update_all(new_values)
+            dependent_records.model.quickery_before_association_update(dependent_records, self, new_values)
           end
         end
 
         def quickery_before_destroy_callback
           model = self.class
 
-          dependent_records_attributes_to_be_updated = {}
+          dependent_records_attributes_to_be_updated = {}.with_indifferent_access
 
           if model.quickery_association_chain_dependees.present?
             model.quickery_association_chain_dependees.each do |association_chain_dependee|
@@ -135,9 +143,9 @@ module Quickery
 
                 dependent_records = association_chain_dependee.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
               end
             end
@@ -154,9 +162,9 @@ module Quickery
 
                 dependent_records = association_chain_intermediary.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}
+                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
                 dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
               end
             end
@@ -166,7 +174,7 @@ module Quickery
             dependent_records = hash.fetch(:dependent_records)
             new_values = hash.fetch(:new_values)
 
-            dependent_records.update_all(new_values)
+            dependent_records.model.quickery_before_association_destroy(dependent_records, self, new_values)
           end
         end
       end

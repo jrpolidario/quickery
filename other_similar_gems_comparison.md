@@ -109,9 +109,6 @@
     * Rails 4 seems to be also not supported. I was getting `ArgumentError (wrong number of arguments (given 1, expected 0))` when doing `User.create` inside rails console.
 
 * [flattery v0.1.0](https://github.com/evendis/flattery) :
-  * Pros against Quickery:
-    * allows custom update method
-    * allows "updates" as a background process
   * Cons against Quickery:
     * Rails 5 is not part of its supported list in their github page. And just to try it out on a Rails 5 app, `Flattery::ValueProvider` did not seem to work, because values are not pushed to the `:notes`'s `:category_name` values.
     * batch-update in one go for multiple quickery-defined attributes instead of updating each

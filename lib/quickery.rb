@@ -3,5 +3,4 @@ Dir[__dir__ + '/quickery/active_record_extensions/*.rb'].each {|file| require fi
 Dir[__dir__ + '/quickery/errors/*.rb'].each {|file| require file }
 
 module Quickery
-  # Your code goes here...
 end

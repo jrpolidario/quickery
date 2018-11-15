@@ -184,6 +184,167 @@ class Employee < ApplicationRecord
 end
 ```
 
+## Advanced Usage
+
+Quickery defines the following for `ActiveRecord::Base` of which you can optionally override in any of your models for advanced usage, i.e:
+
+```ruby
+class Employee < ApplicationRecord
+  belongs_to :branch
+
+  quickery branch: { company: { name: :branch_company_name } }
+
+  # this method will be called before an Employee gets created or updated
+  # i.e. when some_employee.update(branch: some_branch)
+  def self.quickery_before_create_or_update(employee, new_values)
+    employee.assign_attributes(new_values) # default behaviour of this method
+  end
+
+  # this method will be called before any updates happen on any of the association (that a quickery-defined attribute in this model depends on)
+  # i.e. when some_branch.update(company: some_company)
+  # i.e. when some_company.update(name: 'New Company Name')
+  def self.quickery_before_association_update(employees, record_to_be_updated, new_values)
+    employees.update_all(new_values) # default behaviour of this method
+  end
+
+  # this method will be called before any of the association gets destroyed (that a quickery-defined attribute in this model depends on)
+  # i.e. when some_branch.destroy
+  # i.e. when some_company.destroy
+  def self.quickery_before_association_destroy(employees, record_to_be_destroyed, new_values)
+    employees.update_all(new_values) # default behaviour of this method
+  end
+end
+```
+
+### Advanced Usage: Background Job
+
+```ruby
+class Employee < ApplicationRecord
+  belongs_to :branch
+
+  quickery branch: { company: { name: :branch_company_name } }
+
+  def self.quickery_before_create_or_update(employee, new_values)
+    employee.assign_attributes(new_values)
+  end
+
+  # because updates can be slow for a very big DB table, then you move the update logic into a background job
+  # you can even batch the updates into a job like below
+
+  def self.quickery_before_association_update(employees, record_to_be_updated, new_values)
+    employees.find_in_batches(batch_size: 2000) do |grouped_employees|
+      BatchQuickeryUpdatesJob.perform_later(self.class.to_s, grouped_employees.pluck(:id), new_values)
+    end
+  end
+
+  def self.quickery_before_association_destroy(employees, record_to_be_destroyed, new_values)
+    employees.find_in_batches(batch_size: 2000) do |grouped_employees|
+      BatchQuickeryUpdatesJob.perform_later(self.class.to_s, grouped_employees.pluck(:id), new_values)
+    end
+  end
+end
+
+# app/jobs/batch_quickery_updates_job.rb
+class BatchQuickeryUpdatesJob < ApplicationJob
+  # or probably you have a :low_priority queue?
+  queue_as :default
+
+  def perform(model_str, ids, new_values)
+    model = model_str.safe_constantize
+    model.where(id: ids).update_all(new_values)
+  end
+end
+```
+
+### Advanced Usage: Formatting Values
+
+```ruby
+class Employee < ApplicationRecord
+  belongs_to :branch
+
+  quickery branch: { company: { name: :branch_company_name } }
+
+  def self.quickery_before_create_or_update(employee, new_values)
+    employee.assign_attributes(quickery_format_values(new_values))
+  end
+
+  def self.quickery_before_association_update(employees, record_to_be_updated, new_values)
+    employees.update_all(quickery_format_values(new_values))
+  end
+
+  def self.quickery_before_association_destroy(employees, record_to_be_destroyed, new_values)
+    employees.update_all(quickery_format_values(new_values))
+  end
+
+  private
+
+  # example (you can rename this method):
+  def self.quickery_format_values(values)
+    formatted_values = {}
+
+    :branch_company_name.tap do |attr|
+      # remove trailing white spaces and force-single-space between words, and then capitalise all characters
+      formatted_values[attr] = values[attr].squish.upcase if values.has_key? attr
+    end
+
+    :user_first_name.tap do |attr|
+      # only save the first 30 characters of user_first_name string
+      formatted_values[attr] = values[attr][0...30] if values.has_key? attr
+    end
+
+    formatted_values
+  end
+end
+```
+
+### Advanced Usage: Computed Attributes / Values
+
+```ruby
+class Employee < ApplicationRecord
+  belongs_to :branch
+
+  quickery branch: { company: { name: :branch_company_name } }
+
+  def self.quickery_before_create_or_update(employee, new_values)
+    employee.assign_attributes(quickery_with_computed_values(employee, new_values))
+  end
+
+  def self.quickery_before_association_update(employees, record_to_be_updated, new_values)
+    employee.find_each do |employee|
+      employee.update!(quickery_with_computed_values(employee, new_values))
+    end
+  end
+
+  def self.quickery_before_association_destroy(employees, record_to_be_destroyed, new_values)
+    employee.find_each do |employee|
+      employee.update!(quickery_with_computed_values(employee, new_values))
+    end
+  end
+
+  private
+
+  # example (you can rename this method):
+  def self.quickery_with_computed_values(employee, values)
+    with_computed_values = {}
+
+    if values.has_key?(:user_first_name) || values.has_key?(:user_last_name)
+      # concatenate first name and last name
+      with_computed_values[:user_last_name] = "#{values[:user_first_name]} #{values[:user_last_name]}".strip
+    end
+
+    # you can add logic that specifically depends on the record like the following:
+    if employee.is_current_employee?
+      if values.has_key? :branch_company_name
+        # concatenate a unique code for the employee: i.e. a value of "11-5-1239"
+        with_computed_values[:unique_codename] = "#{employee.branch.company.id}-#{employee.branch.id}-#{employee.id}"
+      end
+    end
+
+    with_computed_values
+  end
+end
+```
+
 ## Gotchas
 * Quickery makes use of Rails model callbacks such as `before_update`. This meant that data-integrity holds unless `update_columns` or `update_column` is used which bypasses model callbacks, or unless any manual SQL update is performed.
 * Quickery does not automatically update old records existing in the database that were created before you integrate Quickery, or before you add new/more Quickery-attributes for that model. One solution is [`recreate_quickery_cache!`](#recreate_quickery_cache) below.
@@ -193,6 +354,8 @@ end
 ### For any subclass of `ActiveRecord::Base`:
 
 * defines a set of "hidden" Quickery `before_create`, `before_update`, and `before_destroy` callbacks needed by Quickery to perform the "syncing" of attribute values
+
+* can override `self.quickery_before_create_or_update`, `self.quickery_before_association_update`, `self.quickery_before_association_destroy` for advanced usage such as moving the update logic into a background job, or formatting of the quickery-defined attributes, etc...
 
 #### Class Methods:
 
@@ -248,7 +411,6 @@ end
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 * Support `has_many` as currently only `belongs_to` is supported. This would then allow us to cache Array of values.
 * Support custom-methods-values like [`persistize`](https://github.com/bebanjo/persistize), if it's easy enough to integrate something similar
-* Support background-processing like in [`flattery`](https://github.com/evendis/flattery)
 
 ## Other Similar Gems
 See [my detailed comparisons](other_similar_gems_comparison.md)
@@ -273,6 +435,8 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 1.2.0
+  * DONE: (TODO) added overrideable methods for custom callback logic (i.e. move update logic instead into a background job)
 * 1.1.0
   * added helper method [`determine_quickery_values`](#determine_quickery_values)
   * fixed `recreate_quickery_cache!` raising `NilClass` error when the immediate association is nil
