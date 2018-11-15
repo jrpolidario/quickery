@@ -330,7 +330,7 @@ class Employee < ApplicationRecord
 
     if values.has_key?(:user_first_name) || values.has_key?(:user_last_name)
       # concatenate first name and last name
-      with_computed_values[:user_last_name] = "#{values[:user_first_name]} #{values[:user_last_name]}".strip
+      with_computed_values[:user_full_name] = "#{values[:user_first_name]} #{values[:user_last_name]}".strip
     end
 
     # you can add logic that specifically depends on the record like the following:
