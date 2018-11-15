@@ -281,19 +281,17 @@ class Employee < ApplicationRecord
 
   # example (you can rename this method):
   def self.quickery_format_values(values)
-    formatted_values = {}
-
     :branch_company_name.tap do |attr|
       # remove trailing white spaces and force-single-space between words, and then capitalise all characters
-      formatted_values[attr] = values[attr].squish.upcase if values.has_key? attr
+      values[attr] = values[attr].squish.upcase if values.has_key? attr
     end
 
     :user_first_name.tap do |attr|
       # only save the first 30 characters of user_first_name string
-      formatted_values[attr] = values[attr][0...30] if values.has_key? attr
+      values[attr] = values[attr][0...30] if values.has_key? attr
     end
 
-    formatted_values
+    values
   end
 end
 ```
@@ -328,22 +326,20 @@ class Employee < ApplicationRecord
 
   # example (you can rename this method):
   def self.quickery_with_computed_values(employee, values)
-    with_computed_values = {}
-
     if values.has_key?(:user_first_name) || values.has_key?(:user_last_name)
       # concatenate first name and last name
-      with_computed_values[:user_full_name] = "#{values[:user_first_name]} #{values[:user_last_name]}".strip
+      values[:user_full_name] = "#{values[:user_first_name]} #{values[:user_last_name]}".strip
     end
 
     # you can add logic that specifically depends on the record like the following:
     if employee.is_current_employee?
       if values.has_key? :branch_company_name
         # concatenate a unique code for the employee: i.e. a value of "11-5-1239"
-        with_computed_values[:unique_codename] = "#{employee.branch.company.id}-#{employee.branch.id}-#{employee.id}"
+        values[:unique_codename] = "#{employee.branch.company.id}-#{employee.branch.id}-#{employee.id}"
       end
     end
 
-    with_computed_values
+    values
   end
 end
 ```
