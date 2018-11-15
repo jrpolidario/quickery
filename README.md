@@ -310,6 +310,8 @@ class Employee < ApplicationRecord
     employee.assign_attributes(quickery_with_computed_values(employee, new_values))
   end
 
+  # IMPORTANT: for big tables, `find_each` below can be slow (consider moving into a background job or if possible use the default behaviour which is `update_all`)
+
   def self.quickery_before_association_update(employees, record_to_be_updated, new_values)
     employee.find_each do |employee|
       employee.update!(quickery_with_computed_values(employee, new_values))
