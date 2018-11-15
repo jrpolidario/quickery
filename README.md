@@ -195,6 +195,7 @@ class Employee < ApplicationRecord
   quickery branch: { company: { name: :branch_company_name } }
 
   # this method will be called before an Employee gets created or updated
+  # new_values is a Hash of quickery-defined attribute changes; say: `{ :branch_company_name => 'Jollibee' }`
   # i.e. when some_employee.update(branch: some_branch)
   def self.quickery_before_create_or_update(employee, new_values)
     employee.assign_attributes(new_values) # default behaviour of this method
@@ -228,7 +229,7 @@ class Employee < ApplicationRecord
     employee.assign_attributes(new_values)
   end
 
-  # because updates can be slow for a very big DB table, then you move the update logic into a background job
+  # because updates can be slow for a very big DB table, then you can move the update logic into a background job
   # you can even batch the updates into a job like below
 
   def self.quickery_before_association_update(employees, record_to_be_updated, new_values)
