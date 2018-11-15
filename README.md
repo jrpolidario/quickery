@@ -414,6 +414,7 @@ end
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 * Support `has_many` as currently only `belongs_to` is supported. This would then allow us to cache Array of values.
 * Support custom-methods-values like [`persistize`](https://github.com/bebanjo/persistize), if it's easy enough to integrate something similar
+* Provide a better DSL for "Computed Values" and also probably "Formatted Values" as the current example above, though flexible, looks like it has too much code and the method can potentially grow very big; probably separate into a defined method per computed/formatted value?
 
 ## Other Similar Gems
 See [my detailed comparisons](other_similar_gems_comparison.md)
