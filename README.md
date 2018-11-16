@@ -327,8 +327,10 @@ class Employee < ApplicationRecord
   # example (you can rename this method):
   def self.quickery_with_computed_values(employee, values)
     if values.has_key?(:user_first_name) || values.has_key?(:user_last_name)
+      employee.user_first_name = values[:user_first_name] if values.has_key?(:user_first_name)
+      employee.user_last_name = values[:user_last_name] if values.has_key?(:user_last_name)
       # concatenate first name and last name
-      values[:user_full_name] = "#{values[:user_first_name]} #{values[:user_last_name]}".strip
+      values[:user_full_name] = "#{employee.user_first_name} #{employee.user_last_name}".strip
     end
 
     # you can add logic that specifically depends on the record like the following:
