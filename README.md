@@ -335,7 +335,7 @@ class Employee < ApplicationRecord
 
     # you can add logic that specifically depends on the record like the following:
     if employee.is_current_employee?
-      if values.has_key? :branch_company_name
+      if values.has_key? :branch_company_id
         # concatenate a unique code for the employee: i.e. a value of "11-5-1239"
         values[:unique_codename] = "#{employee.branch.company.id}-#{employee.branch.id}-#{employee.id}"
       end
