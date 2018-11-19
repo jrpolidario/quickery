@@ -111,7 +111,7 @@ end
 
 ## Usage Example 2
 
-* let `Branch` and `Company` model be the same as the Usage Example 1 above
+* let `Branch` and `Company` models be the same as the Usage Example 1 above
 
 ```ruby
 # app/models/employee.rb
@@ -362,17 +362,17 @@ end
 
 ##### `quickery(mappings)`
 * mappings (Hash)
-  * each mapping will create a `Quickery::QuickeryBuilder` object. i.e:
+  * each mapping will create a `Quickery::QuickeryBuilder` object. i.e:s
     * `{ branch: { name: :branch_name }` will create one `Quickery::QuickeryBuilder`, while
     * `{ branch: { name: :branch_name, id: :branch_id }` will create two `Quickery::QuickeryBuilder`
         * In this particular example, you are required to specify `belongs_to :branch` in this model
-        * Similarly, you are required to specify `belongs_to :company` inside `Branch` model, `belongs_to :country` inside `Company` model; etc...
-* quickery-defined attributes such as say `:branch_company_country_category_name` are updated by Quickery automatically whenever any of it's dependent records across models have been changed. Note that updates in this way do not trigger model callbacks, as I wanted to isolate logic and scope of Quickery by not triggering model callbacks that you already have.
+        * Similarly, depending on your defined mappings, i.e. `{ branch: { company: { country: { name: :branch_company_country_name  } } } }`, you would be required to specify `belongs_to :company` inside `Branch` model, `belongs_to :country` inside `Company` model; etc...
+* quickery-defined attributes such as say `:branch_company_country_category_name` are updated by Quickery automatically whenever any of it's dependent records / dependee-attribute across models have been changed or destroyed. Note that updates in this way do not trigger model callbacks, unless you manually overrode the quickery `self.quickery_before_association_update` or `self.quickery_before_association_destroy` and changed the default behaviour to no longer use `update_all`. I use `update_all` by default to improve speed and to bypass validations because attributes that will be updated are just your quickery-defined attributes anyway, and chances are you would not want any validations for these attributes.
 * quickery-defined attributes such as say `:branch_company_country_category_name` are READ-only! Do not update these attributes manually. You can, but it will not automatically update the other end, and thus will break data integrity. If you want to re-update these attributes to match the other end, see `recreate_quickery_cache!` below.
 
 ##### `quickery_builders`
 * returns an `Array` of `Quickery::QuickeryBuilder` objects that have already been defined
-* for more info, see `quickery(&block)` above
+* for more info, see `quickery(mappings)` above
 * you normally do not need to use this method
 
 #### Instance Methods:
