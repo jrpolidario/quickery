@@ -512,7 +512,7 @@ end
     ```
 
 ##### `autoload_unsynced_quickery_attributes!`
-* only works in conjuction with `*_is_synced` attributes.
+* only works in conjuction with `*_is_synced` attributes. See Usage Example 3 above.
 * this will update the record's "still unsynced" quickery-attributes.
 * if all of the record's quickery-attributes are already "synced", then this method does nothing more
 * intended to be used as callback method for `after_find` to automatically support both 1) "old-records" that before quickery has been integrated, and 2) new quickery-attributes to be defined in the future
