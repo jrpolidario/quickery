@@ -432,7 +432,7 @@ class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Mig
 end
 ```
 
-#### Example 2
+#### Example 2 - With `*_is_synced` Attributes
 
 ```
 rails generate quickery:migration employee branch_company_name:string branch_company_id:bigint:index --add_is_synced_attributes
