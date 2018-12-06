@@ -41,6 +41,9 @@ module Quickery
 
                 new_values[depender_column_name] = new_value
               end
+
+              # set to true because on-create, all quickery-attributes are evaluated and assigned
+              new_values[:"#{depender_column_name}_is_synced"] = true if has_attribute? :"#{depender_column_name}_is_synced"
             end
 
             self.class.quickery_before_create_or_update(self, new_values)
@@ -68,6 +71,7 @@ module Quickery
                 end
 
                 new_values[depender_column_name] = new_value
+                new_values[:"#{depender_column_name}_is_synced"] = true if has_attribute? :"#{depender_column_name}_is_synced"
               end
             end
 
@@ -87,10 +91,14 @@ module Quickery
 
                 dependent_records = association_chain_dependee.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
+                records_sql_identifier = dependent_records.to_sql.to_sym
+                dependent_records_attributes_to_be_updated[records_sql_identifier] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:dependent_records] ||= dependent_records
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][depender_column_name.to_sym] = new_value
+                if dependent_records.model.column_names.include? "#{depender_column_name}_is_synced"
+                  dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][:"#{depender_column_name}_is_synced"] = true
+                end
               end
             end
           end
@@ -111,10 +119,15 @@ module Quickery
 
                 dependent_records = association_chain_intermediary.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
+                records_sql_identifier = dependent_records.to_sql.to_sym
+                dependent_records_attributes_to_be_updated[records_sql_identifier] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:dependent_records] ||= dependent_records
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][depender_column_name.to_sym] = new_value
+
+                if dependent_records.model.column_names.include? "#{depender_column_name}_is_synced"
+                  dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][:"#{depender_column_name}_is_synced"] = true
+                end
               end
             end
           end
@@ -143,10 +156,14 @@ module Quickery
 
                 dependent_records = association_chain_dependee.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
+                records_sql_identifier = dependent_records.to_sql.to_sym
+                dependent_records_attributes_to_be_updated[records_sql_identifier] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:dependent_records] ||= dependent_records
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][depender_column_name.to_sym] = new_value
+                if dependent_records.model.column_names.include? "#{depender_column_name}_is_synced"
+                  dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][:"#{depender_column_name}_is_synced"] = true
+                end
               end
             end
           end
@@ -162,10 +179,14 @@ module Quickery
 
                 dependent_records = association_chain_intermediary.dependent_records(self)
                 # use the SQL as the uniqueness identifier, so that multiple quickery-attributes dependent-records are updated in one go, instead of updating each
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:dependent_records] ||= dependent_records
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values] ||= {}.with_indifferent_access
-                dependent_records_attributes_to_be_updated[dependent_records.to_sql.to_sym][:new_values][depender_column_name.to_sym] = new_value
+                records_sql_identifier = dependent_records.to_sql.to_sym
+                dependent_records_attributes_to_be_updated[records_sql_identifier] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:dependent_records] ||= dependent_records
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values] ||= {}.with_indifferent_access
+                dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][depender_column_name.to_sym] = new_value
+                if dependent_records.model.column_names.include? "#{depender_column_name}_is_synced"
+                  dependent_records_attributes_to_be_updated[records_sql_identifier][:new_values][:"#{depender_column_name}_is_synced"] = true
+                end
               end
             end
           end

@@ -1,0 +1,15 @@
+class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version %>
+  def change
+    change_table :<%= table_name %> do |t|
+<% attributes.each do |attribute| -%>
+      t.<%= attribute.type %> :<%= attribute.name %><%= attribute.inject_options %>
+<% if options[:add_is_synced_attributes] -%>
+      t.boolean :<%= attribute.name %>_is_synced, null: false, default: false
+<% end -%>
+<% end -%>
+    end
+<% attributes_with_index.each do |attribute| -%>
+    add_index :<%= table_name %>, :<%= attribute.index_name %><%= attribute.inject_index_options %>
+<% end -%>
+  end
+end

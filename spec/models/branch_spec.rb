@@ -70,6 +70,25 @@ RSpec.describe Branch, type: :model do
         expect(employee_5.branch_company_country_id).to eq current_employee_5_attributes['branch_company_country_id']
         expect(employee_5.branch_company_name).to eq current_employee_5_attributes['branch_company_name']
       end
+
+      context 'when dependent_records exists a corresponding *_is_synced attribute and it has not yet been set (still false)' do
+        before do
+          expect(employee_1).to_not have_attribute :branch_company_country_id_is_synced
+          expect(employee_1).to have_attribute :branch_company_country_name_is_synced
+          expect(employee_1).to have_attribute :branch_company_name_is_synced
+          employee_1.update_columns(branch_company_country_name_is_synced: false, branch_company_name_is_synced: false)
+        end
+
+        it 'marks "set" the quickery-attributes of the dependent_records via the corresponding *is_synced attributes' do
+          branch_1.save!
+
+          employee_1.tap do |employee|
+            employee.reload
+            expect(employee.branch_company_country_name_is_synced).to eq true
+            expect(employee.branch_company_name_is_synced).to eq true
+          end
+        end
+      end
     end
 
     context 'when non-quickery-defined foreign_key attribute is changed' do
@@ -119,6 +138,25 @@ RSpec.describe Branch, type: :model do
         employee_5.reload
         expect(employee_5.branch_company_country_name).to eq current_employee_5_attributes['branch_company_country_name']
         expect(employee_5.branch_company_country_id).to eq current_employee_5_attributes['branch_company_country_id']
+      end
+
+      context 'when dependent_records exists a corresponding *_is_synced attribute and it has not yet been set (still false)' do
+        before do
+          expect(employee_1).to_not have_attribute :branch_company_country_id_is_synced
+          expect(employee_1).to have_attribute :branch_company_country_name_is_synced
+          expect(employee_1).to have_attribute :branch_company_name_is_synced
+          employee_1.update_columns(branch_company_country_name_is_synced: false, branch_company_name_is_synced: false)
+        end
+
+        it 'does not mark "set" the quickery-attributes of the dependent_records' do
+          branch_1.save!
+
+          employee_1.tap do |employee|
+            employee.reload
+            expect(employee.branch_company_country_name_is_synced).to eq false
+            expect(employee.branch_company_name_is_synced).to eq false
+          end
+        end
       end
     end
   end
@@ -176,6 +214,25 @@ RSpec.describe Branch, type: :model do
       employee_5.reload
       expect(employee_5.branch_company_country_name).to_not eq nil
       expect(employee_5.branch_company_country_id).to_not eq nil
+    end
+
+    context 'when dependent_records exists a corresponding *_is_synced attribute and it has not yet been set (still false)' do
+      before do
+        expect(employee_1).to_not have_attribute :branch_company_country_id_is_synced
+        expect(employee_1).to have_attribute :branch_company_country_name_is_synced
+        expect(employee_1).to have_attribute :branch_company_name_is_synced
+        employee_1.update_columns(branch_company_country_name_is_synced: false, branch_company_name_is_synced: false)
+      end
+
+      it 'marks "set" the quickery-attributes of the dependent_records via the corresponding *is_synced attributes' do
+        branch_1.destroy
+
+        employee_1.tap do |employee|
+          employee.reload
+          expect(employee.branch_company_country_name_is_synced).to eq true
+          expect(employee.branch_company_name_is_synced).to eq true
+        end
+      end
     end
   end
 end

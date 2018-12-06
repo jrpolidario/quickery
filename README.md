@@ -26,7 +26,7 @@
     bundle install
     ```
 
-## Usage Example 1
+## Usage Example 1 - Mapped Attribute
 
 ```ruby
 # app/models/employee.rb
@@ -63,7 +63,8 @@ end
 
 ```bash
 # bash
-rails generate migration add_branch_company_name_to_employees branch_company_name:string
+rails generate quickery:migration employee branch_company_name:string
+# or: rails generate migration add_branch_company_name_to_employees branch_company_name:string
 bundle exec rake db:migrate
 ```
 
@@ -109,7 +110,7 @@ Employee.find_each do |employee|
 end
 ```
 
-## Usage Example 2
+## Usage Example 2 - Association via Mapped Attribute
 
 * let `Branch` and `Company` models be the same as the Usage Example 1 above
 
@@ -125,7 +126,8 @@ end
 
 ```bash
 # bash
-rails generate migration add_branch_company_id_to_employees branch_company_id:bigint:index
+rails generate quickery:migration employee branch_company_id:bigint:index
+# or: rails generate migration add_branch_company_id_to_employees branch_company_id:bigint:index
 bundle exec rake db:migrate
 ```
 
@@ -148,6 +150,54 @@ puts Employee.where(company: company)
 # you may however still use `has_many :through` to achieve a simplified code: `company.employees`, but it's still a lot slower because of JOINS
 puts Employee.joins(branch: :company).where(companies: { id: company.id })
 # => [#<Employee id: 1>]
+```
+
+## Usage Example 3 - Autoloading Quickery Attributes
+
+> `autoload_unsynced_quickery_attributes!` below is **ONLY** compatible with optional `*_is_synced` attributes, which can be done by passing `--add_is_synced_attributes` to the `quickery:migration` generator. See example below.
+
+* let `Branch` and `Company` models be the same as the Usage Example 1 above
+
+```ruby
+# app/models/employee.rb
+class Employee < ApplicationRecord
+  belongs_to :branch
+
+  quickery { branch: { company: { id: :branch_company_name } } }
+
+  after_find :autoload_unsynced_quickery_attributes!
+end
+```
+
+```bash
+# bash
+rails generate quickery:migration employee branch_company_name:string --add_is_synced_attributes
+bundle exec rake db:migrate
+```
+
+```ruby
+# rails console
+company = Company.create!(name: 'Jollibee')
+branch = Branch.create!(company: company)
+employee_created_before_quickery_integration = Employee.create!(branch: branch)
+
+puts employee_created_before_quickery_integration.branch_company_name
+# => NoMethodError: undefined method `branch_company_name'
+
+# Let's say the employee record above was created long time ago before Quickery was integrated,
+# and then right now, you added the new quickery-attribute `branch_company_name`.
+
+# Employee record above now then will have "stale" value for `branch_company_name`,
+# because it will have a value of `nil`.
+# But using `after_find :autoload_unsynced_quickery_attributes!` above, all records will
+# then be guaranteed to have up-to-date quickery attributes even if new quickery-attributes
+# will be defined in the future.
+
+puts employee_created_before_quickery_integration.branch_company_name
+# => 'Employee'
+
+# if without `after_find :autoload_unsynced_quickery_attributes!`, the puts just above will instead show
+# => nil
 ```
 
 ## Other Usage Examples
@@ -352,6 +402,56 @@ end
 
 ## DSL
 
+### Quickery Migration Generator:
+
+`rails generate quickery:migration ...` acts as if you are doing a `rails generate model ...` except that it's ONLY going to generate a migration file, therefore:
+
+* Usage format: `rails generate quickery:migration model_name attribute_name_1:type attribute_name_2:type ...`
+* Optional `--add_is_synced_attributes` can be passed to the command to support "autoloading". See Usage Example 3 above.
+
+#### Example 1
+```
+rails generate quickery:migration employee branch_company_name:string branch_company_id:bigint:index
+```
+
+...will generate:
+
+```
+# db/migrate/TIMESTAMP_add_quickery_branch_company_name_branch_company_id_to_employees.rb
+class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Migration[5.2]
+  def change
+    change_table :employees do |t|
+      t.string :branch_company_name
+      t.integer :branch_company_id
+    end
+    add_index :employees, :branch_company_id
+  end
+end
+```
+
+#### Example 2
+
+```
+rails generate quickery:migration employee branch_company_name:string branch_company_id:bigint:index --add_is_synced_attributes
+```
+
+...will generate:
+
+```
+# db/migrate/TIMESTAMP_add_quickery_branch_company_name_branch_company_id_to_employees.rb
+class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Migration[5.2]
+  def change
+    change_table :employees do |t|
+      t.string :branch_company_name
+      t.boolean :branch_company_name_is_synced, null: false, default: false
+      t.integer :branch_company_id
+      t.boolean :branch_company_id_is_synced, null: false, default: false
+    end
+    add_index :employees, :branch_company_id
+  end
+end
+```
+
 ### For any subclass of `ActiveRecord::Base`:
 
 * defines a set of "hidden" Quickery `before_create`, `before_update`, and `before_destroy` callbacks needed by Quickery to perform the "syncing" of attribute values
@@ -408,6 +508,29 @@ end
     # => { branch_company_country_id: 1, branch_compnay_country_name: 'Ireland' }
     ```
 
+##### `autoload_unsynced_quickery_attributes!`
+* only works in conjuction with `*_is_synced` attributes.
+* this will update the record's "still unsynced" quickery-attributes.
+* if all of the record's quickery-attributes are already "synced", then this method does nothing more
+* intended to be used as callback method for `after_find` to automatically support both 1) "old-records" that before quickery has been integrated, and 2) new quickery-attributes to be defined in the future
+* i.e. you can do something like the following:
+
+    ```ruby
+    class Employee < ApplicationRecord
+      belongs_to :branch
+      quickery branch: { company: { name: :branch_company_name } }
+      after_find :autoload_unsynced_quickery_attributes!
+    end
+
+    an_employee_long_time_ago_before_quickery_was_even_integrated = Employee.first
+
+    puts an_employee_long_time_ago_before_quickery_was_even_integrated.branch_company_name
+    # => 'Jollibee'
+
+    # otherwise, if there is no `after_find :autoload_unsynced_quickery_attributes!`, the `puts` above will instead return
+    # => nil
+    ```
+
 ## TODOs
 * Possibly support two-way mapping of attributes? So that you can do, say... `employee.update!(branch_company_name: 'somenewcompanyname')`
 * Support `has_many` as currently only `belongs_to` is supported. This would then allow us to cache Array of values.
@@ -437,6 +560,8 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 1.3.0
+  * implemented tracking of which quickery-attributes have already been synced / not yet via additional optional `*_is_synced` attributes; used in conjuction with [`autoload_unsynced_quickery_attributes!`](#autoload_unsynced_quickery_attributes) intentionally to be declared as callback method for `after_find`, which will make sure that new quickery-attributes defined in the future will work immediately for the record, and that the developer won't worry about doing the `recreate_quickery_cache!` anymore, as the record is guaranteed to be always up-to-date.
 * 1.2.0
   * DONE: (TODO) added overrideable methods for custom callback logic (i.e. move update logic instead into a background job)
 * 1.1.0
