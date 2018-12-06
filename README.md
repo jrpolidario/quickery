@@ -101,7 +101,10 @@ puts employee.branch_company_name
 # => 'McDonalds'
 ```
 
-If you already have "old" records before you've integrated quickery or if you have new quickery-defined attributes, you can update these stale records by using `recreate_quickery_cache!`. See example below:
+If you already have "old" records before you've integrated quickery or if you have new quickery-defined attributes, you can update these stale records...
+
+1. by using `autoload_unsynced_quickery_attributes!` (see Usage Example 3 below), or...
+2. by using `recreate_quickery_cache!`. See example below:
 
 ```ruby
 # rails console
