@@ -19,8 +19,6 @@ module Quickery
           mappings_builder.map_attributes
         end
 
-        private
-
         # subclass overrideable
         def quickery_before_create_or_update(dependent_record, new_values)
           dependent_record.assign_attributes(new_values)

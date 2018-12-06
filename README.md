@@ -563,6 +563,8 @@ See [my detailed comparisons](other_similar_gems_comparison.md)
 5. Create new Pull Request
 
 ## Changelog
+* 1.3.1
+  * Fix error from 1.3.0 where private method was being called outside class
 * 1.3.0
   * implemented tracking of which quickery-attributes have already been synced / not yet via additional optional `*_is_synced` attributes; used in conjuction with [`autoload_unsynced_quickery_attributes!`](#autoload_unsynced_quickery_attributes) intentionally to be declared as callback method for `after_find`, which will make sure that new quickery-attributes defined in the future will work immediately for the record, and that the developer won't worry about doing the `recreate_quickery_cache!` anymore, as the record is guaranteed to be always up-to-date.
 * 1.2.0
