@@ -194,7 +194,7 @@ puts employee_created_before_quickery_integration.branch_company_name
 # Let's say the employee record above was created long time ago before Quickery was integrated,
 # and then right now, you added the new quickery-attribute `branch_company_name`.
 
-# Employee record above now then will have "stale" value for `branch_company_name`,
+# Employee record above and all "old" Employee records now then will have "stale" `branch_company_name`,
 # because it will have a value of `nil`.
 # But using `after_find :autoload_unsynced_quickery_attributes!` above, all records will
 # then be guaranteed to have up-to-date quickery attributes even if new quickery-attributes
