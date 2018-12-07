@@ -9,6 +9,7 @@
     * It is not documented, but you'll need to do `Rails.application.eager_load!` first or something similar, to first load all the models as otherwise defined `persistize` across the models will be autoloaded, and therefore will not work properly. Quickery already does this eager loading of models out of the box. For more info, see [lib/quickery/railtie.rb](lib/quickery/railtie.rb)
     * batch-update in one go for multiple quickery-defined attributes instead of updating each attribute/method
     * loops through each children records and update each attribute which can get very slow with lots of children associated records, and therefore as many number of SQL UPDATE queries vs Quickery which uses `update_all` which is just one update query, and does not loop through children records:
+    * Quickery supports optional "autoloading" which automatically immediately support old records and future-defined-attributes
 
       ```ruby
       # app/models/project.rb
@@ -113,6 +114,7 @@
     * Rails 5 is not part of its supported list in their github page. And just to try it out on a Rails 5 app, `Flattery::ValueProvider` did not seem to work, because values are not pushed to the `:notes`'s `:category_name` values.
     * batch-update in one go for multiple quickery-defined attributes instead of updating each
     * Using Rails 4, does not support nested associated dependencies for `belongs_to`:
+    * Quickery supports optional "autoloading" which automatically immediately support old records and future-defined-attributes
 
       ```ruby
       class Note < ActiveRecord::Base
