@@ -68,6 +68,8 @@ rails generate quickery:migration employee branch_company_name:string
 bundle exec rake db:migrate
 ```
 
+For details regarding the generated migration file, see [--add_is_synced_attributes](#example-2---with-_is_synced-attributes)
+
 ```ruby
 # rails console
 company = Company.create!(name: 'Jollibee')
@@ -177,6 +179,8 @@ end
 rails generate quickery:migration employee branch_company_name:string --add_is_synced_attributes
 bundle exec rake db:migrate
 ```
+
+For details regarding the generated migration file, see [--add_is_synced_attributes](#example-2---with-_is_synced-attributes)
 
 ```ruby
 # rails console
