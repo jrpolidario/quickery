@@ -166,7 +166,7 @@ puts Employee.joins(branch: :company).where(companies: { id: company.id })
 class Employee < ApplicationRecord
   belongs_to :branch
 
-  quickery { branch: { company: { id: :branch_company_name } } }
+  quickery { branch: { company: { name: :branch_company_name } } }
 
   after_find :autoload_unsynced_quickery_attributes!
 end
