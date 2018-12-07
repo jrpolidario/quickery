@@ -429,7 +429,7 @@ class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Mig
   def change
     change_table :employees do |t|
       t.string :branch_company_name
-      t.integer :branch_company_id
+      t.bigint :branch_company_id
     end
     add_index :employees, :branch_company_id
   end
@@ -451,7 +451,7 @@ class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Mig
     change_table :employees do |t|
       t.string :branch_company_name
       t.boolean :branch_company_name_is_synced, null: false, default: false
-      t.integer :branch_company_id
+      t.bigint :branch_company_id
       t.boolean :branch_company_id_is_synced, null: false, default: false
     end
     add_index :employees, :branch_company_id
