@@ -201,9 +201,10 @@ puts employee_created_before_quickery_integration.branch_company_name
 # will be defined in the future.
 
 puts employee_created_before_quickery_integration.branch_company_name
-# => 'Employee'
+# => 'Jollibee'
 
-# if without `after_find :autoload_unsynced_quickery_attributes!`, the puts just above will instead show
+# if without `after_find :autoload_unsynced_quickery_attributes!`, because this Employee is an "old" record
+# then the puts just above will instead show
 # => nil
 ```
 
