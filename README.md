@@ -418,13 +418,13 @@ end
 * Optional `--add_is_synced_attributes` can be passed to the command to support "autoloading". See Usage Example 3 above.
 
 #### Example 1
-```
+```bash
 rails generate quickery:migration employee branch_company_name:string branch_company_id:bigint:index
 ```
 
 ...will generate:
 
-```
+```ruby
 # db/migrate/TIMESTAMP_add_quickery_branch_company_name_branch_company_id_to_employees.rb
 class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Migration[5.2]
   def change
@@ -439,13 +439,13 @@ end
 
 #### Example 2 - With `*_is_synced` Attributes
 
-```
+```bash
 rails generate quickery:migration employee branch_company_name:string branch_company_id:bigint:index --add_is_synced_attributes
 ```
 
 ...will generate:
 
-```
+```ruby
 # db/migrate/TIMESTAMP_add_quickery_branch_company_name_branch_company_id_to_employees.rb
 class AddQuickeryBranchCompanyNameBranchCompanyIdToEmployees < ActiveRecord::Migration[5.2]
   def change
